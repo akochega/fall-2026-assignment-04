@@ -1,0 +1,71 @@
+erDiagram
+    %% Existing relation in database
+    USERS {
+        int id PK
+        string email
+        string name
+        timestamp created_at
+    }
+
+    BORROWERS {
+        int id PK
+        int user_id FK
+    }
+
+    BOOKS {
+        int id PK
+        string title
+        string isbn
+        date publication_date
+    }
+
+    AUTHORS {
+        int id PK
+        string name
+        string bio
+    }
+
+    GENRES {
+        int id PK
+        string name
+        string description
+    }
+
+    BOOK_AUTHORS {
+        int id PK
+        int book_id FK
+        int author_id FK
+    }
+
+    BOOK_GENRES {
+        int id PK
+        int book_id FK
+        int genre_id FK
+    }
+
+    LOANS {
+        int id PK
+        int book_id FK
+        int borrower_id FK
+        date borrowed_date
+        date returned_date
+    }
+
+    %% Relationships and cardinalities
+    %% A borrower corresponds to exactly one user; a user may be a borrower or may not be (0 or 1)
+    USERS ||--o| BORROWERS : "registers as"
+
+    %% Many-to-many relationship between books and authors via BOOK_AUTHORS
+    BOOKS ||--o{ BOOK_AUTHORS : "has"
+    AUTHORS ||--o{ BOOK_AUTHORS : "writes"
+
+    %% Many-to-many relationship between books and genres via BOOK_GENRES
+    BOOKS ||--o{ BOOK_GENRES : "has"
+    GENRES ||--o{ BOOK_GENRES : "categorizes"
+
+    %% A borrower can have many loans; each loan belongs to exactly one borrower
+    BORROWERS ||--o{ LOANS : "borrows"
+
+    %% A book can have many loans over time; each loan belongs to exactly one book
+    %% Note: At most one active loan per book (enforced where returned_date is null)
+    BOOKS ||--o{ LOANS : "loaned in"
